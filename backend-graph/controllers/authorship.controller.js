@@ -1,28 +1,37 @@
 const { getSession } = require("../config/neo4j");
 
+const sanitizeAuthorId = (id) => {
+  let authorId = String(id).trim().replace(/[\r\n]/g, '');
+  if (!authorId) return null;
+  const authorIdNum = Number(authorId);
+  if (!isNaN(authorIdNum) && authorIdNum.toString() === authorId) {
+    return authorIdNum;
+  }
+  return authorId;
+};
+
+const sanitizePaperId = (id) => {
+  const paperId = String(id).trim().replace(/[\r\n]/g, '');
+  return paperId || null;
+};
+
 module.exports = {
-  // Créer une relation Authorship (auteur écrit un papier)
   createAuthorship: async (req, res) => {
     const { authorId, paperId } = req.body;
     
-    // Validation des données
     if (!authorId || !paperId) {
       return res.status(400).json({ error: "Les champs 'authorId' et 'paperId' sont requis" });
     }
     
     const session = getSession();
     try {
-      // Sanitisation et conversion des IDs
-      let cleanAuthorId = String(authorId).trim().replace(/[\r\n]/g, '');
-      const cleanPaperId = String(paperId).trim().replace(/[\r\n]/g, '');
+      const cleanAuthorId = sanitizeAuthorId(authorId);
+      const cleanPaperId = sanitizePaperId(paperId);
       
-      // Convertir authorId en nombre si c'est un nombre valide
-      const authorIdNum = Number(cleanAuthorId);
-      if (!isNaN(authorIdNum) && authorIdNum.toString() === cleanAuthorId) {
-        cleanAuthorId = authorIdNum;
+      if (!cleanAuthorId || !cleanPaperId) {
+        return res.status(400).json({ error: "Invalid authorId or paperId" });
       }
       
-      // Vérifier que l'auteur et le papier existent
       const authorCheck = await session.run(
         "MATCH (a:Author {authorId: $authorId}) RETURN a",
         { authorId: cleanAuthorId }
@@ -39,7 +48,6 @@ module.exports = {
         return res.status(404).json({ error: "Paper not found" });
       }
       
-      // Créer la relation
       const result = await session.run(
         `MATCH (a:Author {authorId: $authorId}), (p:Paper {paperId: $paperId})
          MERGE (a)-[r:AUTHORED]->(p)
@@ -62,22 +70,14 @@ module.exports = {
     }
   },
 
-  // Supprimer une relation Authorship
   deleteAuthorship: async (req, res) => {
     const session = getSession();
     try {
-      // Sanitisation et conversion des IDs
-      let cleanAuthorId = String(req.params.authorId).trim().replace(/[\r\n]/g, '');
-      const cleanPaperId = String(req.params.paperId).trim().replace(/[\r\n]/g, '');
+      const cleanAuthorId = sanitizeAuthorId(req.params.authorId);
+      const cleanPaperId = sanitizePaperId(req.params.paperId);
       
       if (!cleanAuthorId || !cleanPaperId) {
         return res.status(400).json({ error: "Invalid authorId or paperId" });
-      }
-      
-      // Convertir authorId en nombre si c'est un nombre valide
-      const authorIdNum = Number(cleanAuthorId);
-      if (!isNaN(authorIdNum) && authorIdNum.toString() === cleanAuthorId) {
-        cleanAuthorId = authorIdNum;
       }
       
       const result = await session.run(
