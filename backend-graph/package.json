@@ -1,0 +1,21 @@
+{
+  "name": "backend-graph",
+  "version": "1.0.0",
+  "description": "API REST backend pour gestion de chercheurs et publications avec Neo4j",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["neo4j", "graph", "api", "rest"],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "neo4j-driver": "^6.0.1"
+  }
+}
