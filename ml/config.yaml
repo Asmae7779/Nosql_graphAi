@@ -1,0 +1,25 @@
+# Configuration Neo4j
+neo4j:
+  uri: "neo4j://127.0.0.1:7687"
+  user: "neo4j"
+  password: "h20031717"  
+  database: "neo4j"
+
+# Paramètres du graphe
+graph:
+  cache_path: "../data/graph_lcc.pkl"
+  MODEL_PATH: "../results/link_prediction_model.pt"
+  min_collaborations: 1  # Nombre minimum de co-publications
+  
+# Paramètres de détection de communautés
+community:
+  louvain:
+    resolution: 1.0
+    seed: 42
+  label_propagation:
+    max_iter: 1000
+  girvan_newman:
+    max_level: 5  # Nombre maximum de niveaux de division
+  infomap:
+    num_trials: 10
+    seed: 42

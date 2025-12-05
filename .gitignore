@@ -1,0 +1,78 @@
+# ===========================
+# PYTHON
+# ===========================
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pkl
+*.log
+*.sqlite
+*.db
+*.egg-info/
+.eggs/
+
+# Environnements virtuels
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+ml/venv/
+
+# ML Files (models, embeddings, cache)
+*.pt
+*.pth
+*.h5
+*.joblib
+*.npz
+*.npy
+*.csv
+*.tsv
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+
+# ===========================
+# NODE / EXPRESS
+# ===========================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+dist/
+build/
+
+# Environment variables
+.env
+.env.*
+
+# ===========================
+# OS FILES
+# ===========================
+.DS_Store
+Thumbs.db
+
+# ===========================
+# EDITORS
+# ===========================
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ===========================
+# NEO4J
+# ===========================
+neo4j/
+*.dump
+*.backup
+
+# ===========================
+# TEMP / CACHE
+# ===========================
+*.cache/
+.cache/
+tmp/
+temp/
+git rm -r --cached venv

@@ -5,6 +5,8 @@ const cors = require("cors");
 const researcherRoutes = require("./routes/researcher.routes");
 const publicationRoutes = require("./routes/publication.routes");
 const authorshipRoutes = require("./routes/authorship.routes");
+const communitiesRoutes = require('./routes/communities');
+const recommendationsRoutes = require('./routes/recommendations.routes');
 const { getSession } = require("./config/neo4j");
 
 const app = express();
@@ -64,6 +66,8 @@ app.use("/researchers", researcherRoutes);
 app.use("/papers", publicationRoutes);
 app.use("/publications", publicationRoutes);
 app.use("/authorships", authorshipRoutes);
+app.use('/communities', communitiesRoutes);
+app.use('/recommendations', recommendationsRoutes);
 
 app.use((err, req, res, next) => {
   if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
@@ -88,6 +92,64 @@ app.use((err, req, res, next) => {
 app.use((req, res) => {
   res.status(404).json({ error: "Route not found" });
 });
+
+app.get("/model", (req, res) => {
+  const modelPath = path.join(__dirname, "../results/link_prediction_model.pt");
+
+  // Vérifier si le fichier existe
+  fs.readFile(modelPath, "utf8", (err, data) => {
+    if (err) {
+      console.error('Erreur lors de la lecture du fichier:', err);
+      return res.status(500).json({ error: "Erreur lors de la lecture du modèle" });
+    }
+    
+    // Retourner le fichier ou un résumé des données (dépend de votre utilisation)
+    res.json({ message: "Modèle chargé avec succès", data: data });
+  });
+});
+
+app.get("/communities", (req, res) => {
+  const partitionPath = path.join(__dirname, "../results/communities/louvain_partition.pkl");
+
+  fs.readFile(partitionPath, "utf8", (err, data) => {
+    if (err) {
+      console.error('Erreur lors de la lecture du fichier:', err);
+      return res.status(500).json({ error: "Erreur lors de la lecture des partitions de la communauté" });
+    }
+
+    res.json({ message: "Communautés chargées avec succès", data: JSON.parse(data) });
+  });
+});
+
+// Endpoint pour récupérer le résumé de l'entraînement
+app.get("/training-summary", (req, res) => {
+  const summaryPath = path.join(__dirname, "../results/training_summary.json");
+
+  fs.readFile(summaryPath, "utf8", (err, data) => {
+    if (err) {
+      console.error('Erreur lors de la lecture du fichier:', err);
+      return res.status(500).json({ error: "Erreur lors de la lecture du résumé d'entraînement" });
+    }
+
+    res.json({ message: "Résumé d'entraînement chargé avec succès", data: JSON.parse(data) });
+  });
+});
+
+// Endpoint pour récupérer les chercheurs d'exemple
+app.get("/example-researchers", (req, res) => {
+  const exampleResearchersPath = path.join(__dirname, "../results/example_researchers.json");
+
+  fs.readFile(exampleResearchersPath, "utf8", (err, data) => {
+    if (err) {
+      console.error('Erreur lors de la lecture du fichier:', err);
+      return res.status(500).json({ error: "Erreur lors de la lecture des chercheurs d'exemple" });
+    }
+
+    res.json({ message: "Chercheurs d'exemple chargés avec succès", data: JSON.parse(data) });
+  });
+});
+
+
 
 const PORT = process.env.PORT || 5000;
 
